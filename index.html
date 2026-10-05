@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luồng 01 · Mở hồ sơ chủ thể — IPO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#EDEFEB;--surface:#FFFFFF;--ink:#16211F;--ink2:#4A5652;--ink3:#7F8A85;
+  --rule:#D7DBD4;--rule-soft:#E5E8E2;--com:#3F6B4F;--tom:#6A4B8A;--dim:var(--com);
+  --serif:"IBM Plex Serif",Georgia,serif;--sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;
+  --maxw:1240px;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;}
+
+.masthead{padding:52px 0 30px;border-bottom:1px solid var(--rule);}
+.eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin:0 0 16px;}
+.masthead h1{font-family:var(--serif);font-weight:600;font-size:clamp(2rem,4.6vw,2.9rem);line-height:1.08;letter-spacing:-.02em;margin:0 0 14px;}
+.deck{font-size:1rem;color:var(--ink2);max-width:70ch;margin:0;}
+.deck b{color:var(--ink);font-weight:600;}
+
+.map{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0 0;}
+.map a{display:block;background:var(--surface);border:1px solid var(--rule-soft);border-top:3px solid var(--dim);padding:14px 16px;text-decoration:none;color:var(--ink);}
+.map a:hover{border-color:var(--dim);}
+.map .n{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--dim);}
+.map .t{display:block;font-family:var(--serif);font-weight:600;font-size:1rem;margin-top:2px;}
+.map .o{display:block;font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-top:6px;}
+
+main{padding:30px 0 10px;}
+.rec{background:var(--surface);border:1px solid var(--rule-soft);border-left:4px solid var(--dim);}
+.rec-body{padding:6px 30px 26px;}
+
+.sub{border-bottom:1px solid var(--rule-soft);padding:24px 0;}
+.sub:last-child{border-bottom:none;padding-bottom:6px;}
+.sub-name{font-family:var(--serif);font-size:1.15rem;font-weight:600;margin:0 0 14px;display:flex;gap:11px;align-items:baseline;}
+.sub-name .n{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--dim);flex:none;}
+
+.ipo{display:grid;grid-template-columns:1fr 1.6fr 1fr;border:1px solid var(--rule-soft);}
+.ipo-cell{padding:16px 18px;border-left:1px solid var(--rule-soft);}
+.ipo-cell:first-child{border-left:none;}
+.ipo-cell.mid{background:#FAFBF9;}
+.ipo-tag{font-family:var(--mono);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:600;margin:0 0 10px;display:flex;align-items:center;gap:7px;}
+.ipo-tag::after{content:"";flex:1;height:1px;background:var(--rule-soft);}
+.grp{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:10px 0 2px;}
+.grp:first-of-type{margin-top:0;}
+.ipo ul{margin:0;padding:0;list-style:none;font-size:.88rem;line-height:1.5;color:var(--ink2);}
+.ipo ul li{padding:3px 0 3px 13px;position:relative;}
+.ipo ul li::before{content:"";position:absolute;left:0;top:12px;width:5px;height:1px;background:var(--ink3);}
+.ipo ul ul{margin-top:2px;}
+.ipo ul ul li{color:var(--ink3);}
+.ipo ol{margin:0;padding:0;list-style:none;font-size:.88rem;line-height:1.5;color:var(--ink2);}
+.ipo ol>li{padding:6px 0 6px 40px;position:relative;}
+.ipo ol>li .sn{position:absolute;left:0;top:7px;font-family:var(--mono);font-size:.68rem;font-weight:600;color:var(--dim);}
+.ipo ol>li>b{color:var(--ink);font-weight:600;}
+.br{display:block;padding:3px 0 1px 14px;position:relative;color:var(--ink2);}
+.br::before{content:"→";position:absolute;left:0;color:var(--dim);font-size:.78rem;}
+.br i{font-style:normal;color:var(--ink);font-weight:500;}
+.chip{display:inline-block;font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.1em;padding:2px 7px;border-radius:2px;vertical-align:1px;margin-right:4px;}
+.chip.call{background:color-mix(in srgb,var(--tom) 15%,#fff);color:var(--tom);}
+.out b{color:var(--ink);font-weight:600;}
+
+footer{border-top:1px solid var(--rule);margin-top:40px;padding:20px 0 48px;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);}
+
+@media (max-width:960px){
+  .map{grid-template-columns:repeat(2,1fr);}
+  .ipo{grid-template-columns:1fr;}
+  .ipo-cell{border-left:none;border-top:1px solid var(--rule-soft);}
+  .ipo-cell:first-child{border-top:none;}
+}
+@media (max-width:600px){
+  .wrap{padding:0 16px;}
+  .map{grid-template-columns:1fr;}
+  .rec-body{padding:4px 18px 20px;}
+}
+@media print{
+  body{background:#fff;}
+  .sub{break-inside:avoid;}
+  .map a{border-color:var(--rule);}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Thư viện luồng nghiệp vụ · COM · Design / BIS / IPO</p>
+    <h1>Luồng 01 · Mở hồ sơ chủ thể</h1>
+    <p class="deck">Tách bạch <b>danh tính</b> của một chủ thể khỏi <b>vai trò</b> của họ: danh tính chỉ có một, vai trò có thể có nhiều. <b>Hồ sơ = ID chủ thể + Nghiệp vụ + Vai trò.</b> Gồm 4 luồng con.</p>
+
+    <nav class="map">
+      <a href="#s11"><span class="n">1.1</span><span class="t">Mở ID chủ thể</span><span class="o">Output · ID chủ thể</span></a>
+      <a href="#s12"><span class="n">1.2</span><span class="t">Gán quan hệ</span><span class="o">Output · ID quan hệ</span></a>
+      <a href="#s13"><span class="n">1.3</span><span class="t">Gán vai trò</span><span class="o">Output · ID vai trò</span></a>
+      <a href="#s14"><span class="n">1.4</span><span class="t">Mở hồ sơ theo Nghiệp vụ</span><span class="o">Output · ID hồ sơ</span></a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+<article class="rec">
+<div class="rec-body">
+
+  <!-- 1.1 -->
+  <section class="sub" id="s11">
+    <h2 class="sub-name"><span class="n">1.1</span> Mở ID chủ thể</h2>
+    <div class="ipo">
+      <div class="ipo-cell">
+        <p class="ipo-tag">Input</p>
+        <p class="grp">Bắt buộc</p>
+        <ul>
+          <li>Loại chủ thể</li>
+          <li>Loại giấy tờ định danh</li>
+          <li>Giá trị định danh</li>
+          <li>Nguồn tạo</li>
+          <li>Tên gọi</li>
+        </ul>
+        <p class="grp">Không bắt buộc</p>
+        <ul>
+          <li>Giới tính</li>
+          <li>Ngày sinh / ngày thành lập</li>
+        </ul>
+      </div>
+      <div class="ipo-cell mid">
+        <p class="ipo-tag">Process</p>
+        <ol>
+          <li><span class="sn">1.1.1</span><b>Kiểm tra đủ trường bắt buộc và đúng định dạng theo loại chủ thể</b>
+            <span class="br"><i>Fail</i> — báo lỗi và chỉnh sửa</span>
+            <span class="br"><i>Pass</i> — sang bước 2</span>
+          </li>
+          <li><span class="sn">1.1.2</span><b>Tra trùng theo cặp loại – giá trị giấy tờ</b>
+            <span class="br"><i>Đã tồn tại</i> — thông báo "Thông tin đã tồn tại"</span>
+            <span class="br"><i>Chưa tồn tại</i> — sang bước 3</span>
+          </li>
+          <li><span class="sn">1.1.3</span><b>Tạo ID</b>
+            <span class="br">Sinh mã ID mới</span>
+            <span class="br">Cài đặt trạng thái: Hoạt động</span>
+          </li>
+        </ol>
+      </div>
+      <div class="ipo-cell out">
+        <p class="ipo-tag">Output</p>
+        <ul>
+          <li><b>ID chủ thể</b>
+            <ul><li>Trạng thái</li></ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1.2 -->
+  <section class="sub" id="s12">
+    <h2 class="sub-name"><span class="n">1.2</span> Gán quan hệ</h2>
+    <div class="ipo">
+      <div class="ipo-cell">
+        <p class="ipo-tag">Input</p>
+        <p class="grp">Bắt buộc</p>
+        <ul>
+          <li>Hai đầu quan hệ
+            <ul><li>ID bên A</li><li>ID bên B</li></ul>
+          </li>
+          <li>Loại quan hệ</li>
+        </ul>
+        <p class="grp">Không bắt buộc</p>
+        <ul>
+          <li>Thời gian hiệu lực
+            <ul><li>Ngày bắt đầu hiệu lực</li><li>Ngày kết thúc hiệu lực</li></ul>
+          </li>
+        </ul>
+      </div>
+      <div class="ipo-cell mid">
+        <p class="ipo-tag">Process</p>
+        <ol>
+          <li><span class="sn">1.2.1</span><b>Kiểm tra 2 ID</b>
+            <span class="br">Đang hoạt động</span>
+            <span class="br">Không trùng nhau</span>
+          </li>
+          <li><span class="sn">1.2.2</span><span class="chip call">GỌI</span><b>Luồng Thẩm định và phê duyệt (nếu cần)</b> — thẩm định điều kiện mối quan hệ
+            <span class="br"><i>Chấp thuận</i> — sang bước 3</span>
+            <span class="br"><i>Từ chối</i> — kết thúc luồng</span>
+          </li>
+          <li><span class="sn">1.2.3</span><b>Gán quan hệ</b>
+            <span class="br">Ghi nhận thời gian hiệu lực (nếu có)</span>
+            <span class="br">Cài đặt trạng thái: Hoạt động</span>
+          </li>
+        </ol>
+      </div>
+      <div class="ipo-cell out">
+        <p class="ipo-tag">Output</p>
+        <ul>
+          <li><b>ID quan hệ</b>
+            <ul><li>Trạng thái</li><li>Hiệu lực</li></ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1.3 -->
+  <section class="sub" id="s13">
+    <h2 class="sub-name"><span class="n">1.3</span> Gán vai trò</h2>
+    <div class="ipo">
+      <div class="ipo-cell">
+        <p class="ipo-tag">Input</p>
+        <p class="grp">Bắt buộc</p>
+        <ul>
+          <li>ID chủ thể</li>
+          <li>Loại vai trò</li>
+        </ul>
+        <p class="grp">Không bắt buộc</p>
+        <ul>
+          <li>Thời gian hiệu lực
+            <ul><li>Ngày bắt đầu hiệu lực</li><li>Ngày kết thúc hiệu lực</li></ul>
+          </li>
+        </ul>
+      </div>
+      <div class="ipo-cell mid">
+        <p class="ipo-tag">Process</p>
+        <ol>
+          <li><span class="sn">1.3.1</span><b>Kiểm tra chủ thể đang hoạt động</b>
+            <span class="br"><i>Fail</i> — báo lỗi</span>
+            <span class="br"><i>Pass</i> — sang bước 2</span>
+          </li>
+          <li><span class="sn">1.3.2</span><span class="chip call">GỌI</span><b>Luồng Thẩm định và phê duyệt (nếu cần)</b> — thẩm định điều kiện vai trò
+            <span class="br"><i>Chấp thuận</i> — sang bước 3</span>
+            <span class="br"><i>Từ chối</i> — kết thúc luồng</span>
+          </li>
+          <li><span class="sn">1.3.3</span><b>Gán vai trò với khoảng hiệu lực</b>
+            <span class="br">Trạng thái = Hoạt động</span>
+          </li>
+        </ol>
+      </div>
+      <div class="ipo-cell out">
+        <p class="ipo-tag">Output</p>
+        <ul>
+          <li><b>ID vai trò</b>
+            <ul><li>Trạng thái</li><li>Hiệu lực</li></ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1.4 -->
+  <section class="sub" id="s14">
+    <h2 class="sub-name"><span class="n">1.4</span> Mở hồ sơ theo Nghiệp vụ</h2>
+    <div class="ipo">
+      <div class="ipo-cell">
+        <p class="ipo-tag">Input</p>
+        <p class="grp">Bắt buộc</p>
+        <ul>
+          <li>ID chủ thể</li>
+          <li>ID vai trò</li>
+          <li>Nghiệp vụ</li>
+        </ul>
+      </div>
+      <div class="ipo-cell mid">
+        <p class="ipo-tag">Process</p>
+        <ol>
+          <li><span class="sn">1.4.1</span><b>Kiểm tra chủ thể đang hoạt động</b>
+            <span class="br"><i>Fail</i> — báo lỗi</span>
+            <span class="br"><i>Pass</i> — sang bước 2</span>
+          </li>
+          <li><span class="sn">1.4.2</span><span class="chip call">GỌI</span><b>Luồng Thẩm định và phê duyệt (nếu cần)</b> — thẩm định hồ sơ
+            <span class="br"><i>Chấp thuận</i> — sang bước 3</span>
+            <span class="br"><i>Từ chối</i> — kết thúc luồng</span>
+          </li>
+          <li><span class="sn">1.4.3</span><b>Tạo hồ sơ</b>
+            <span class="br">Sinh mã hồ sơ</span>
+            <span class="br">Khoảng hiệu lực</span>
+          </li>
+        </ol>
+      </div>
+      <div class="ipo-cell out">
+        <p class="ipo-tag">Output</p>
+        <ul>
+          <li><b>ID hồ sơ</b>
+            <ul><li>Trạng thái</li><li>Hiệu lực</li></ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">Nguồn: EB 2026 · Sheet Luồng 01 · Mở hồ sơ chủ thể · Design / BIS / IPO</div>
+</footer>
+
+</body>
+</html>
